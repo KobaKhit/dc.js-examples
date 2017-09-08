@@ -32,6 +32,17 @@ function createChart(Dimension,userDim,w,h){
 	.height(h)
 	.yAxisLabel('% Of Total')
 	.dimension(Dimension)
+	.on('filtered',function(c,f){
+		$("#filters>li[data-dim='"+userDim+"']").remove()
+		var filt = chart.filters()
+		if(filt.length!=0){
+			console.log('Added filter')
+			var fi;
+			if(typeof(filt[0])=='object'){fi = filt[0].map(function(d){ return _.round(d)}).toString()} else{fi = filt.toString()}
+			var $li = $("<li>", {'data-dim': userDim, html: userDim+': '+fi});
+			$('#filters').append($li)
+		}
+	})
 
 	if(vartype == 'string'){
 		var catCountGroup  = Dimension.group().reduceCount();
@@ -148,20 +159,20 @@ window.addEventListener("load", function() {
 			userDim = $("#variableList>option:selected").html()
 			create_or_show(userDim)
 
-			charts.map(function(d){
-				d.chart.on('filtered',function(c,f){
-					$("#filters>li[data-dim='"+userDim+"']").remove()
-					var filt = d.chart.filters()
-					if(filt.length!=0){
-						console.log('Added filter')
-						var fi;
-						if(typeof(filt[0])=='object'){fi = filt[0].map(function(d){ return _.round(d)}).toString()} else{fi = filt.toString()}
-						var $li = $("<li>", {'data-dim': d.chartdim, html: d.chartdim+': '+fi});
-						$('#filters').append($li)
-					}
-				})
+			// charts.map(function(d){
+			// 	d.chart.on('filtered',function(c,f){
+			// 		$("#filters>li[data-dim='"+userDim+"']").remove()
+			// 		var filt = d.chart.filters()
+			// 		if(filt.length!=0){
+			// 			console.log('Added filter')
+			// 			var fi;
+			// 			if(typeof(filt[0])=='object'){fi = filt[0].map(function(d){ return _.round(d)}).toString()} else{fi = filt.toString()}
+			// 			var $li = $("<li>", {'data-dim': d.chartdim, html: d.chartdim+': '+fi});
+			// 			$('#filters').append($li)
+			// 		}
+			// 	})
 				
-			})
+			// })
 
 			ch = $("#missingValues>input:checked").val();
 	  		if(ch == 'Exclude') {Dimension = dim(userDim); Dimension.filter(function(d) { return d!= '-1' & d!= 'NA'});}
