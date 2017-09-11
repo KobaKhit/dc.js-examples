@@ -20,6 +20,8 @@
     color: #3182bd;
     font-weight: bold;
 }
+
+div{ display: block}
 </style>
   </head>
 
@@ -53,11 +55,21 @@
           <input type="radio" name="zero" value="Exclude"> Exclude<br>
         </form>
 
-        <b>Filters</b>
-        <ul id='filters'></ul>
+       
       </div>
 
       <div id="charts"></div>
+
+      <div>
+      <b>Filters</b>
+      <ul id='filters'></ul>
+      </div>
+
+      <div id="chartjss" >
+        
+
+      </div>
+
 
     </div>
   </body>
@@ -67,6 +79,7 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.8/dc.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
   <script type="text/javascript" src = 'app.js'></script>
 
 </html>

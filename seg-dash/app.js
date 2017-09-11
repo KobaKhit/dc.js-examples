@@ -30,7 +30,7 @@ function createChart(Dimension,userDim,w,h){
 	.margins({top: 20, right: 50, bottom: 30, left: 30}) 
 	.width(w)
 	.height(h)
-	.yAxisLabel('% Of Total')
+	.yAxisLabel('Count Of Total')
 	.dimension(Dimension)
 	.on('filtered',function(c,f){
 		$("#filters>li[data-dim='"+userDim+"']").remove()
@@ -91,8 +91,8 @@ function createChart(Dimension,userDim,w,h){
 
 window.addEventListener("load", function() {
 	d3.json("df2.json", function(data) {
-		var w = 678,
-			h = 480,
+		var w = 578,
+			h = 380,
 
 			obj       = data[0],
 			vartypes  = _.values(obj).map(function(x) {return typeof(x);}),
@@ -159,38 +159,27 @@ window.addEventListener("load", function() {
 			userDim = $("#variableList>option:selected").html()
 			create_or_show(userDim)
 
-			// charts.map(function(d){
-			// 	d.chart.on('filtered',function(c,f){
-			// 		$("#filters>li[data-dim='"+userDim+"']").remove()
-			// 		var filt = d.chart.filters()
-			// 		if(filt.length!=0){
-			// 			console.log('Added filter')
-			// 			var fi;
-			// 			if(typeof(filt[0])=='object'){fi = filt[0].map(function(d){ return _.round(d)}).toString()} else{fi = filt.toString()}
-			// 			var $li = $("<li>", {'data-dim': d.chartdim, html: d.chartdim+': '+fi});
-			// 			$('#filters').append($li)
-			// 		}
-			// 	})
-				
-			// })
+			// 
+
 
 			ch = $("#missingValues>input:checked").val();
-	  		if(ch == 'Exclude') {Dimension = dim(userDim); Dimension.filter(function(d) { return d!= '-1' & d!= 'NA'});}
+	  		if(ch == 'Exclude') { Dimension = dim(userDim);Dimension.filter(function(d) { return d!= '-1' && d!= 'NA'});}
 	  		else {Dimension.filter(null)};
 
 			ch = $("#zeroValues>input:checked").val();
-	  		if(ch == 'Exclude') {Dimension = dim(userDim); Dimension.filter(function(d) { return d!= 0});}
+	  		if(ch == 'Exclude') { Dimension = dim(userDim);Dimension.filter(function(d) { return d!= 0});}
 	  		else {Dimension.filter(null)};
 			
 	  		// Dimension  = ndx.dimension(function(d) {return d[userDim];})
 	  		// catCountGroup  = Dimension.group().reduceCount()
 	  		dc.renderAll();
+	  		
 		});
 
 		// Missinsg values filter
 	  	$('#missingValues').change(function() {
 	  		ch = $("#missingValues>input:checked").val();
-	  		if(ch == 'Exclude') {Dimension = dim(userDim); Dimension.filter(function(d) { return d!= '-1' & d!= 'NA'});}
+	  		if(ch == 'Exclude') {Dimension = dim(userDim); Dimension.filter(function(d) { return d!= '-1' && d!= 'NA'});}
 	  		else {Dimension.filter(null)};
 	  		dc.redrawAll();
 	  	})
@@ -215,5 +204,89 @@ window.addEventListener("load", function() {
 	  	$('#resetAll').click(function() {
 	  		resetAll()
 	  	})
+
+	  	// Chart js
+	  	function get_series(dat,fiel){
+	  		var sum = 0,
+				count = 0,
+				missing = 0;
+			_.map(dat,function(d){
+				if(d[fiel]=='0'){
+					count+=1
+				} else if(d[fiel]=='1'){
+					count+=1
+					sum+=1
+				} else{missing+=1;count+=1}
+			});
+			return {'yes':sum,'total':count,'missing':missing}
+		}
+	  	
+		var dat = Dimension.top(Infinity),
+			fiels = Object.keys(variables),
+			fiels = _.filter(fiels,function(f){
+				var uni = _.uniq(_.map(dat,function(d){return d[f]}))
+				return _.isEmpty(_.xor(uni, [ "0", "1", "-1" ])) 
+			}),
+			dataa = _.map(fiels, function(f){
+				return get_series(dat,f)
+			});
+
+		function create_js(labels,data){
+			// var chartid = fiel.replace(/\s/g,'');
+			var $div = $('<div>',{height:'1500px',display:'block'}).append($('<canvas>',{id:'chartjs'}));
+			$('#chartjss').append($div);
+			var ctx = $('#' + 'chartjs');
+			console.log('#' + 'chartjs')
+			var chartjs = new Chart(ctx, {
+			    // The type of chart we want to create
+			    type: 'horizontalBar',
+
+			    // The data for our dataset
+			    data: {
+			        labels: labels,
+			        datasets: [{
+			            label: '',
+			            backgroundColor: 'rgb(255, 99, 132)',
+			            borderColor: 'rgb(255, 99, 132)',
+			            data: data,
+			        }]
+			    },
+
+			    // Configuration options go here
+			    options: {
+			    	legend: false,
+			    	responsive: true,
+			    	maintainAspectRatio: false,
+			    	scales:{
+			            xAxes: [{
+			            	position: 'top',
+			                display: true,
+			                ticks:{
+			                	suggestedMax: 100,
+			                	mirror: true,
+			                	callback: function(value) {
+					               return value + "%"
+					            }
+			                },
+			                scaleLabel: {
+					           display: true,
+					           labelString: "Percentage"
+					       }
+			            }],
+			            yAxes:[{
+			            	ticks: {
+				                fontSize: 10
+				            }
+			            }]
+			        }
+			    }
+			});
+
+			return chartjs
+		}
+		var d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)})
+		console.log(d)
+		create_js(fiels, d)
+		
 	});
 });
