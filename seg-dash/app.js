@@ -248,7 +248,7 @@ window.addEventListener("load", function() {
 			            label: '',
 			            backgroundColor: 'rgb(255, 99, 132)',
 			            borderColor: 'rgb(255, 99, 132)',
-			            data: data,
+			            data: data
 			        }]
 			    },
 
@@ -263,7 +263,6 @@ window.addEventListener("load", function() {
 			                display: true,
 			                ticks:{
 			                	suggestedMax: 100,
-			                	mirror: true,
 			                	callback: function(value) {
 					               return value + "%"
 					            }
@@ -275,7 +274,8 @@ window.addEventListener("load", function() {
 			            }],
 			            yAxes:[{
 			            	ticks: {
-				                fontSize: 10
+				                fontSize: 10,
+				                mirror:false
 				            }
 			            }]
 			        }
