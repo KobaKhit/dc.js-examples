@@ -160,14 +160,14 @@ window.addEventListener("load", function() {
 			create_or_show(userDim)
 
 			// 
-
+			Dimension = dim(userDim)
 
 			ch = $("#missingValues>input:checked").val();
-	  		if(ch == 'Exclude') { Dimension = dim(userDim);Dimension.filter(function(d) { return d!= '-1' && d!= 'NA'});}
+	  		if(ch == 'Exclude') {Dimension.filter(function(d) { return d!= '-1' && d!= 'NA'});}
 	  		else {Dimension.filter(null)};
 
 			ch = $("#zeroValues>input:checked").val();
-	  		if(ch == 'Exclude') { Dimension = dim(userDim);Dimension.filter(function(d) { return d!= 0});}
+	  		if(ch == 'Exclude') {Dimension.filter(function(d) { return d!= 0});}
 	  		else {Dimension.filter(null)};
 			
 	  		// Dimension  = ndx.dimension(function(d) {return d[userDim];})
@@ -186,7 +186,8 @@ window.addEventListener("load", function() {
 	  	// Zero values filter
 	  	$('#zeroValues').change(function() {
 	  		ch = $("#zeroValues>input:checked").val();
-	  		if(ch == 'Exclude') {Dimension = dim(userDim); Dimension.filter(function(d) { return d!= 0});}
+
+	  		if(ch == 'Exclude') { Dimension = dim(userDim);Dimension.filter(function(d) { return d!= 0});}
 	  		else {Dimension.filter(null)};
 	  		dc.redrawAll();
 	  	})
@@ -284,9 +285,18 @@ window.addEventListener("load", function() {
 
 			return chartjs
 		}
-		var d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)})
-		console.log(d)
-		create_js(fiels, d)
+		var d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)}),
+			chartjs=create_js(fiels, d)
+
+
+		// update chart
+		function update_js(data) {
+			chartjs.data.datasets.forEach(function(dataset, i) {
+				dataset.backgroundColor = 'rgb(255, 99, 132)';
+				dataset.data = data
+			});
+			chart.update();
+		}
 		
 	});
 });
