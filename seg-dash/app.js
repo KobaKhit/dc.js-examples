@@ -161,6 +161,13 @@ function create_js(labels,data){
 		                mirror:false
 		            }
 	            }]
+	        },
+	        tooltips:{
+	        	callbacks: {
+	        		label: function(t,c){
+	        			return t.xLabel +'%'
+	        		}
+	        	}
 	        }
 	    }
 	});
@@ -295,17 +302,6 @@ window.addEventListener("load", function() {
 			userDim = $("#variableList>option:selected").html()
 			create_or_show(userDim)
 
-			// 
-			Dimension = dim(userDim)
-
-			ch = $("#missingValues>input:checked").val();
-	  		if(ch == 'Exclude') {Dimension.filter(function(d) { return d!= '-1' && d!= 'NA'});}
-	  		else {Dimension.filter(null)};
-
-			ch = $("#zeroValues>input:checked").val();
-	  		if(ch == 'Exclude') {Dimension.filter(function(d) { return d!= 0});}
-	  		else {Dimension.filter(null)};
-			
 	  		dc.renderAll();
 
 	  // 		var dat = Dimension.top(Infinity),
@@ -328,7 +324,6 @@ window.addEventListener("load", function() {
 	  	// Zero values filter
 	  	$('#zeroValues').change(function() {
 	  		ch = $("#zeroValues>input:checked").val();
-
 	  		if(ch == 'Exclude') { Dimension = dim(userDim);Dimension.filter(function(d) { return d!= 0});}
 	  		else {Dimension.filter(null)};
 	  		dc.redrawAll();
