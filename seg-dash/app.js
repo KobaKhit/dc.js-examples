@@ -12,9 +12,34 @@ function remove_empty_bins(source_group) {
 var chartcount = 0;
 var charts = [];
 
+// Chart js
+function get_series(dat,fiel){
+	var sum = 0,
+	count = 0,
+	missing = 0;
+	_.map(dat,function(d){
+		if(d[fiel]=='0'){
+			count+=1
+		} else if(d[fiel]=='1'){
+			count+=1
+			sum+=1
+		} else{missing+=1;count+=1}
+	});
+	return {'yes':sum,'total':count,'missing':missing}
+}
+
+// update chart
+function update_js(chartjs,data) {
+	chartjs.data.datasets.forEach(function(dataset, i) {
+		dataset.backgroundColor = 'rgb(255, 99, 132)';
+		dataset.data = data
+	});
+	chartjs.update();
+}
+
+
 function createChart(Dimension,userDim,w,h){
 	
-
 	// Configure charts
 	var chartname = "chart" + chartcount.toString();
     var chartid = "#chart" + chartcount.toString();  
@@ -32,17 +57,17 @@ function createChart(Dimension,userDim,w,h){
 	.height(h)
 	.yAxisLabel('Count Of Total')
 	.dimension(Dimension)
-	.on('filtered',function(c,f){
-		$("#filters>li[data-dim='"+userDim+"']").remove()
-		var filt = chart.filters()
-		if(filt.length!=0){
-			console.log('Added filter')
-			var fi;
-			if(typeof(filt[0])=='object'){fi = filt[0].map(function(d){ return _.round(d)}).toString()} else{fi = filt.toString()}
-			var $li = $("<li>", {'data-dim': userDim, html: userDim+': '+fi});
-			$('#filters').append($li)
-		}
-	})
+	// .on('filtered',function(c,f){
+	// 	$("#filters>li[data-dim='"+userDim+"']").remove()
+	// 	var filt = chart.filters()
+	// 	if(filt.length!=0){
+	// 		console.log('Added filter')
+	// 		var fi;
+	// 		if(typeof(filt[0])=='object'){fi = filt[0].map(function(d){ return _.round(d)}).toString()} else{fi = filt.toString()}
+	// 		var $li = $("<li>", {'data-dim': userDim, html: userDim+': '+fi});
+	// 		$('#filters').append($li)
+	// 	}
+	// })
 
 	if(vartype == 'string'){
 		var catCountGroup  = Dimension.group().reduceCount();
@@ -89,54 +114,63 @@ function createChart(Dimension,userDim,w,h){
 	return {chart: chart, chartdim: userDim, dimension: Dimension} 
 };
 
+function create_js(labels,data){
+	// var chartid = fiel.replace(/\s/g,'');
+	var $div = $('<div>',{height:'1250px',display:'block'}).append($('<canvas>',{id:'chartjs'}));
+	$('#chartjss').append($div);
+	var ctx = $('#' + 'chartjs');
+	console.log('#' + 'chartjs')
+	var chartjs = new Chart(ctx, {
+	    // The type of chart we want to create
+	    type: 'horizontalBar',
+
+	    // The data for our dataset
+	    data: {
+	        labels: labels,
+	        datasets: [{
+	            label: '',
+	            backgroundColor: 'rgb(255, 99, 132)',
+	            borderColor: 'rgb(255, 99, 132)',
+	            data: data
+	        }]
+	    },
+
+	    // Configuration options go here
+	    options: {
+	    	legend: false,
+	    	responsive: true,
+	    	maintainAspectRatio: false,
+	    	scales:{
+	            xAxes: [{
+	            	position: 'top',
+	                display: true,
+	                ticks:{
+	                	suggestedMax: 100,
+	                	callback: function(value) {
+			               return value + "%"
+			            }
+	                },
+	                scaleLabel: {
+			           display: true,
+			           labelString: "Percentage"
+			       }
+	            }],
+	            yAxes:[{
+	            	ticks: {
+		                fontSize: 10,
+		                mirror:false
+		            }
+	            }]
+	        }
+	    }
+	});
+
+	return chartjs
+}
+
 window.addEventListener("load", function() {
 	d3.json("df2.json", function(data) {
-		var w = 578,
-			h = 380,
-
-			obj       = data[0],
-			vartypes  = _.values(obj).map(function(x) {return typeof(x);}),
-			variables = _.zipObject(Object.keys(obj),vartypes);
-
-		console.log(obj)
-
-		// Create variable list
-		$('#variableList').empty();
-		$.each(variables, function(k, v) {
-			$('#variableList').append($('<option></option>').html(k));
-		});
-
-	    var userDim = $("#variableList>option:selected").html(),
-	    // var userDim = 'Age 11 - 15 Male',
-
-	    ndx           	 = crossfilter(data);
-	    dc.dataCount("#dc-data-count")
-        .dimension(ndx)
-        .group(ndx.groupAll());
-
-	    function dim(userDim){
-		    var Dimension        = ndx.dimension(function(d) {return d[userDim];})
-			// missingDimension = ndx.dimension(function(d) {
-			// 	return ((d[userDim]!= '-1' & d[userDim]!= 'NA') ? 'Include' : 'Exclude')
-			// 	// console.log(a)
-			// }),
-
-			// zeroDimension = ndx.dimension(function(d) {
-			// 	return ((d[userDim]!= '0' & d[userDim]!=0) ? 'Include' : 'Exclude');
-			// 	// console.log(a)
-			// });
-			return Dimension
-		}
-
-		
-
-		var Dimension = dim(userDim)
-		
-		var cha = createChart(Dimension,userDim,w,h),
-		    charts = [];
-		charts.push(cha)
-		
-		dc.renderAll();
+		function dim(userDim){return ndx.dimension(function(d) {return d[userDim];});}
 
 		function create_or_show(userDim){
 			$("#charts").children().hide(); // hide drawn charts
@@ -152,7 +186,109 @@ window.addEventListener("load", function() {
 			} else {
 				$("div[data-dim='"+userDim+"']").show()}
 		}
+
+		function resetAll(){
+	  		chartcount = 0;
+			charts = [];
+			ndx.remove();
+	  		$('#charts').children().remove()
+	  		dc.filterAll()
+	  		ndx = crossfilter(data)
+	  		dc.dataCount("#dc-data-count")
+	        .dimension(ndx)
+	        .group(ndx.groupAll());
+
+	  		userDim = $("#variableList>option:selected").html()
+			create_or_show(userDim)
+			dc.renderAll()
+
+			var dat = dim(userDim).top(Infinity),
+		    fiels = _.filter(labels,function(f){
+					var uni = _.uniq(_.map(dat,function(d){return d[f]}))
+					return _.isEmpty(_.xor(uni, [ "0", "1", "-1" ])) 
+				}),
+			dataa = _.map(fiels, function(f){
+				return get_series(dat,f)
+			}),
+			d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)});
+			update_js(chartjs,d)
+	  	}
+
+		// dc variables
+		var w = 378,
+			h = 280,
+			obj       = data[0],
+			vartypes  = _.values(obj).map(function(x) {return typeof(x);}),
+			labels = Object.keys(obj),
+			variables = _.zipObject(labels,vartypes);
+
+
+		// Create variable list
+		$('#variableList').empty();
+		$.each(variables, function(k, v) {
+			$('#variableList').append($('<option></option>').html(k));
+		});
+
+	    var userDim = $("#variableList>option:selected").html(),
+	    // var userDim = 'Age 11 - 15 Male',
+	    	ndx     = crossfilter(data);
+	    
+        // dcjs
+		var Dimension = dim(userDim);
 		
+		var cha = createChart(Dimension,userDim,w,h),
+		    charts = [];
+		charts.push(cha);
+		
+
+		dc.dataCount("#dc-data-count")
+        .dimension(ndx)
+        .group(ndx.groupAll());
+
+		
+		dc.renderAll();
+
+		// chartjs
+		var dat = Dimension.top(Infinity),
+	    fiels = _.filter(labels,function(f){
+				var uni = _.uniq(_.map(dat,function(d){return d[f]}))
+				return _.isEmpty(_.xor(uni, [ "0", "1", "-1" ])) 
+			}),
+		dataa = _.map(fiels, function(f){
+			return get_series(dat,f)
+		}),
+		d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)});
+
+		var chartjs = create_js(fiels,d);
+
+		function dc_on(){	
+			dc.chartRegistry.list().forEach(function(chart) {
+			    chart.on('filtered', function() {
+			        // your event listener code goes here.
+					$("#filters>li[data-dim='"+userDim+"']").remove()
+					var filt = chart.filters()
+					if(filt.length!=0){
+						console.log('Added filter')
+						var fi;
+						if(typeof(filt[0])=='object'){fi = filt[0].map(function(d){ return _.round(d)}).toString()} else{fi = filt.toString()}
+						var $li = $("<li>", {'data-dim': userDim, html: userDim+': '+fi});
+						$('#filters').append($li)
+					}
+
+					var dat = Dimension.top(Infinity),
+						dataa = _.map(fiels, function(f){
+							return get_series(dat,f)
+						});
+					var d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)})
+					update_js(chartjs,d)
+				});
+			})
+		}
+
+		dc_on()
+
+		
+	
 		$('#variableList').change(function() {
 			
 			//  get user dimension
@@ -170,9 +306,15 @@ window.addEventListener("load", function() {
 	  		if(ch == 'Exclude') {Dimension.filter(function(d) { return d!= 0});}
 	  		else {Dimension.filter(null)};
 			
-	  		// Dimension  = ndx.dimension(function(d) {return d[userDim];})
-	  		// catCountGroup  = Dimension.group().reduceCount()
 	  		dc.renderAll();
+
+	  // 		var dat = Dimension.top(Infinity),
+			// 	dataa = _.map(fiels, function(f){
+			// 		return get_series(dat,f)
+			// 	});
+			// var d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)})
+			// update_js(chartjs,d)
+			dc_on()
 	  		
 		});
 
@@ -191,112 +333,9 @@ window.addEventListener("load", function() {
 	  		else {Dimension.filter(null)};
 	  		dc.redrawAll();
 	  	})
-
-	  	function resetAll(){
-	  		chartcount = 0;
-			charts = [];
-	  		$('#charts').children().remove()
-	  		dc.filterAll()
-	  		userDim = $("#variableList>option:selected").html()
-			create_or_show(userDim)
-			dc.renderAll()
-	  	}
-
+	  	
 	  	$('#resetAll').click(function() {
 	  		resetAll()
 	  	})
-
-	  	// Chart js
-	  	function get_series(dat,fiel){
-	  		var sum = 0,
-				count = 0,
-				missing = 0;
-			_.map(dat,function(d){
-				if(d[fiel]=='0'){
-					count+=1
-				} else if(d[fiel]=='1'){
-					count+=1
-					sum+=1
-				} else{missing+=1;count+=1}
-			});
-			return {'yes':sum,'total':count,'missing':missing}
-		}
-	  	
-		var dat = Dimension.top(Infinity),
-			fiels = Object.keys(variables),
-			fiels = _.filter(fiels,function(f){
-				var uni = _.uniq(_.map(dat,function(d){return d[f]}))
-				return _.isEmpty(_.xor(uni, [ "0", "1", "-1" ])) 
-			}),
-			dataa = _.map(fiels, function(f){
-				return get_series(dat,f)
-			});
-
-		function create_js(labels,data){
-			// var chartid = fiel.replace(/\s/g,'');
-			var $div = $('<div>',{height:'1500px',display:'block'}).append($('<canvas>',{id:'chartjs'}));
-			$('#chartjss').append($div);
-			var ctx = $('#' + 'chartjs');
-			console.log('#' + 'chartjs')
-			var chartjs = new Chart(ctx, {
-			    // The type of chart we want to create
-			    type: 'horizontalBar',
-
-			    // The data for our dataset
-			    data: {
-			        labels: labels,
-			        datasets: [{
-			            label: '',
-			            backgroundColor: 'rgb(255, 99, 132)',
-			            borderColor: 'rgb(255, 99, 132)',
-			            data: data
-			        }]
-			    },
-
-			    // Configuration options go here
-			    options: {
-			    	legend: false,
-			    	responsive: true,
-			    	maintainAspectRatio: false,
-			    	scales:{
-			            xAxes: [{
-			            	position: 'top',
-			                display: true,
-			                ticks:{
-			                	suggestedMax: 100,
-			                	callback: function(value) {
-					               return value + "%"
-					            }
-			                },
-			                scaleLabel: {
-					           display: true,
-					           labelString: "Percentage"
-					       }
-			            }],
-			            yAxes:[{
-			            	ticks: {
-				                fontSize: 10,
-				                mirror:false
-				            }
-			            }]
-			        }
-			    }
-			});
-
-			return chartjs
-		}
-		var d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)}),
-			chartjs=create_js(fiels, d)
-
-
-		// update chart
-		function update_js(data) {
-			chartjs.data.datasets.forEach(function(dataset, i) {
-				dataset.backgroundColor = 'rgb(255, 99, 132)';
-				dataset.data = data
-			});
-			chart.update();
-		}
-		
 	});
 });
