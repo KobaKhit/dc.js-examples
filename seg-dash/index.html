@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.8/dc.min.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
 
     <title>Sixers Segmentation Dash</title>
 
@@ -29,43 +30,44 @@ div{ display: block}
     <!-- This code is in the public domain. Enjoy! -->
     <h1>Segmentation Dashboard</h1>
 
-    <div class="container">
+    <div class="container-fluid">
+      <div class = 'row'>
+        <div class = 'col-md-4'>
+          <!-- Variable list -->
+          <div>
+            <select id="variableList" ></select>
+          </div>
 
-      <!-- Variable list -->
-      <select id="variableList" ></select>
-      <div>
-        <div id = 'dc-data-count'>You have
-          <span class="filter-count"></span>
-          selected out of 
-          <span class="total-count"></span>
-          rows. 
-          <a id = 'resetAll' href="#">Reset All</a>
+          <div id = 'dc-data-count'>You have
+            <span class="filter-count"></span>
+            selected out of 
+            <span class="total-count"></span>
+            Full Season Ticket Holders. 
+            <div><a id = 'resetAll' href="#">Reset All</a></div>
+          </div>
+          
+          <br>
+
+          <b>Missing values</b>
+          <form id = 'missingValues' action="">
+            <input type="checkbox" name="missing" value="Exclude"> Exclude<br>
+          </form>
+
+          <b>Zero values</b>
+          <form id = 'zeroValues' action="">
+            <input type="checkbox" name="zero" value="Exclude"> Exclude<br>
+          </form>
+
+          <div id="charts" class = 'container'></div>
+          <div>
+            <b>Filters</b>
+            <ul id='filters'></ul>
+          </div>
         </div>
-        
-        <br>
 
-        <b>Missing values</b>
-        <form id = 'missingValues' action="">
-          <input type="checkbox" name="missing" value="Exclude" checked> Exclude<br>
-        </form>
-        <b>Zero values</b>
-        <form id = 'zeroValues' action="">
-          <input type="checkbox" name="zero" value="Exclude" checked> Exclude<br>
-        </form>
-
-       
-      </div>
-
-      <div id="charts"></div>
-
-      <div>
-      <b>Filters</b>
-      <ul id='filters'></ul>
-      </div>
-
-      <div id="chartjss" >
-        
-
+        <div class="col-md-8" style = 'height:1200px'><canvas id='chartjs'></canvas></div>
+          
+   
       </div>
 
 
@@ -77,7 +79,9 @@ div{ display: block}
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.8/dc.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
   <script type="text/javascript" src = 'app.js'></script>
 
 </html>

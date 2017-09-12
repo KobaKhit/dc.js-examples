@@ -116,10 +116,10 @@ function createChart(Dimension,userDim,w,h){
 
 function create_js(labels,data){
 	// var chartid = fiel.replace(/\s/g,'');
-	var $div = $('<div>',{height:'1250px',display:'block'}).append($('<canvas>',{id:'chartjs'}));
-	$('#chartjss').append($div);
+	// var $div = $('<canvas>',{id:'chartjs'});
+	// $('body').append($div);
 	var ctx = $('#' + 'chartjs');
-	console.log('#' + 'chartjs')
+
 	var chartjs = new Chart(ctx, {
 	    // The type of chart we want to create
 	    type: 'horizontalBar',
@@ -152,7 +152,7 @@ function create_js(labels,data){
 	                },
 	                scaleLabel: {
 			           display: true,
-			           labelString: "Percentage"
+			           labelString: "Percentage of Total"
 			       }
 	            }],
 	            yAxes:[{
@@ -208,17 +208,8 @@ window.addEventListener("load", function() {
 	  		userDim = $("#variableList>option:selected").html()
 			create_or_show(userDim)
 			dc.renderAll()
-
-			var dat = dim(userDim).top(Infinity),
-		    fiels = _.filter(labels,function(f){
-					var uni = _.uniq(_.map(dat,function(d){return d[f]}))
-					return _.isEmpty(_.xor(uni, [ "0", "1", "-1" ])) 
-				}),
-			dataa = _.map(fiels, function(f){
-				return get_series(dat,f)
-			}),
-			d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)});
-			update_js(chartjs,d)
+			
+			$('body').find('input:checkbox').attr('checked', false);
 	  	}
 
 		// dc variables
@@ -282,7 +273,7 @@ window.addEventListener("load", function() {
 						$('#filters').append($li)
 					}
 
-					var dat = Dimension.top(Infinity),
+					var dat = dim(userDim).top(Infinity),
 						dataa = _.map(fiels, function(f){
 							return get_series(dat,f)
 						});
@@ -331,6 +322,21 @@ window.addEventListener("load", function() {
 	  	
 	  	$('#resetAll').click(function() {
 	  		resetAll()
+	  		userDim = $("#variableList>option:selected").html()
+	  		var dat = dim(userDim).top(Infinity),
+			  //   fiels = _.filter(labels,function(f){
+					// 	var uni = _.uniq(_.map(dat,function(d){return d[f]}))
+					// 	return _.isEmpty(_.xor(uni, [ "0", "1", "-1" ])) 
+					// }),
+				dataa = _.map(fiels, function(f){
+					return get_series(dat,f)
+				}),
+			d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)});
+			console.log(d)
+			update_js(chartjs,d)
+			dc_on()
 	  	})
+
+	  	$('select').select2();
 	});
 });
