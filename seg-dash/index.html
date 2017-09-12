@@ -43,20 +43,21 @@ div{ display: block}
             selected out of 
             <span class="total-count"></span>
             Full Season Ticket Holders. 
-            <div><a id = 'resetAll' href="#">Reset All</a></div>
           </div>
           
           <br>
 
           <b>Missing values</b>
-          <form id = 'missingValues' action="">
+          <form id = 'missingValues' style = 'display:inline' action="">
             <input type="checkbox" name="missing" value="Exclude"> Exclude<br>
           </form>
 
           <b>Zero values</b>
-          <form id = 'zeroValues' action="">
+          <form id = 'zeroValues' style = 'display:inline' action="">
             <input type="checkbox" name="zero" value="Exclude"> Exclude<br>
           </form>
+
+          <div><a id = 'resetAll' href="#">Reset All</a></div>
 
           <div id="charts" class = 'container'></div>
           <div>

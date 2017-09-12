@@ -52,7 +52,7 @@ function createChart(Dimension,userDim,w,h){
     	vartype = typeof(max);
     
 	chart
-	.margins({top: 20, right: 50, bottom: 30, left: 30}) 
+	.margins({top: 20, right: 50, bottom: 30, left: 50}) 
 	.width(w)
 	.height(h)
 	.yAxisLabel('Count Of Total')
@@ -208,13 +208,13 @@ window.addEventListener("load", function() {
 	  		userDim = $("#variableList>option:selected").html()
 			create_or_show(userDim)
 			dc.renderAll()
-			
+
 			$('body').find('input:checkbox').attr('checked', false);
 	  	}
 
 		// dc variables
-		var w = 378,
-			h = 280,
+		var w = 478,
+			h = 330,
 			obj       = data[0],
 			vartypes  = _.values(obj).map(function(x) {return typeof(x);}),
 			labels = Object.keys(obj),
@@ -260,7 +260,10 @@ window.addEventListener("load", function() {
 		var chartjs = create_js(fiels,d);
 
 		function dc_on(){	
-			dc.chartRegistry.list().forEach(function(chart) {
+
+			charts.forEach(function(c) {
+				var chart = c.chart
+					
 			    chart.on('filtered', function() {
 			        // your event listener code goes here.
 					$("#filters>li[data-dim='"+userDim+"']").remove()
@@ -273,7 +276,7 @@ window.addEventListener("load", function() {
 						$('#filters').append($li)
 					}
 
-					var dat = dim(userDim).top(Infinity),
+					var dat = c.dimension.top(Infinity),
 						dataa = _.map(fiels, function(f){
 							return get_series(dat,f)
 						});
