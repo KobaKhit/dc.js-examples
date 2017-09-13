@@ -57,17 +57,12 @@ function createChart(Dimension,userDim,w,h){
 	.height(h)
 	.yAxisLabel('Count Of Total')
 	.dimension(Dimension)
-	// .on('filtered',function(c,f){
-	// 	$("#filters>li[data-dim='"+userDim+"']").remove()
-	// 	var filt = chart.filters()
-	// 	if(filt.length!=0){
-	// 		console.log('Added filter')
-	// 		var fi;
-	// 		if(typeof(filt[0])=='object'){fi = filt[0].map(function(d){ return _.round(d)}).toString()} else{fi = filt.toString()}
-	// 		var $li = $("<li>", {'data-dim': userDim, html: userDim+': '+fi});
-	// 		$('#filters').append($li)
-	// 	}
-	// })
+	.colors(d3.scale.ordinal().domain(["OK","NA"])
+                                .range(["#1F77B4","#e84747"]))
+		.colorAccessor(function(d) { 
+            if(d.key == '-1' || d.key == 'NA') 
+                return "NA"
+            return "OK";})
 
 	if(vartype == 'string'){
 		var catCountGroup  = Dimension.group().reduceCount();
@@ -80,18 +75,13 @@ function createChart(Dimension,userDim,w,h){
 		.x(d3.scale.ordinal()) 
 		.xUnits(dc.units.ordinal)
 		.y(d3.scale.linear().domain([0,maxy+500]))
-		.colors(d3.scale.ordinal().domain(["OK","NA"])
-                                .range(["#1F77B4","#e84747"]))
-		.colorAccessor(function(d) { 
-            if(d.key == '-1' || d.key == 'NA') 
-                return "NA"
-            return "OK";})
+
 	} else {
 		
 		catCountGroup = Dimension.group().reduceCount();
 		if(userDim == 'Avg_itemprice'){
 			catCountGroup = Dimension.group(function(d) { return Math.round(d/100.0)*100 }).reduceCount()
-		}
+		} else if (userDim == 'Avg_orderqty'){catCountGroup = Dimension.group(function(d) { return Math.round(d) }).reduceCount()}
 
 		var y_values = catCountGroup.all().map(function(d){return d.value}),
 			maxy = _.max(y_values),
@@ -103,8 +93,8 @@ function createChart(Dimension,userDim,w,h){
 		.group(catCountGroup)
 		// .xUnits(dc.units.fp.precision(binwidth))
 		.xUnits(function() {return 50;})
-		.x(d3.scale.linear().domain([-10,max]))
-		.y(d3.scale.linear().domain([miny,maxy+150]))
+		.x(d3.scale.linear().domain([-1,max]))
+		.y(d3.scale.linear().domain([0,maxy+150]))
 		// .elasticX(true)
 		
 	}
@@ -192,7 +182,7 @@ window.addEventListener("load", function() {
 				charts.push(cha);
 				console.log('plotted new graph')
 			} else {
-				$("div[data-dim='"+userDim+"']").show()}
+				$("div[data-dim='"+userDim.replace("'",'') +"']").show()}
 		}
 
 		function resetAll(){
@@ -214,7 +204,7 @@ window.addEventListener("load", function() {
 	  	}
 
 		// dc variables
-		var w = 478,
+		var w = 578,
 			h = 330,
 			obj       = data[0],
 			vartypes  = _.values(obj).map(function(x) {return typeof(x);}),
@@ -267,13 +257,13 @@ window.addEventListener("load", function() {
 					
 			    chart.on('filtered', function() {
 			        // your event listener code goes here.
-					$("#filters>li[data-dim='"+userDim+"']").remove()
+					$("#filters>li[data-dim='"+userDim.replace("'",'')+"']").remove()
 					var filt = chart.filters()
 					if(filt.length!=0){
 						console.log('Added filter')
 						var fi;
 						if(typeof(filt[0])=='object'){fi = filt[0].map(function(d){ return _.round(d)}).toString()} else{fi = filt.toString()}
-						var $li = $("<li>", {'data-dim': userDim, html: userDim+': '+fi});
+						var $li = $("<li>", {'data-dim': userDim.replace("'",''), html: userDim+': '+fi});
 						$('#filters').append($li)
 					}
 
