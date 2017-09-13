@@ -92,8 +92,8 @@ function createChart(Dimension,userDim,w,h){
 		.elasticY(true)
 		.group(catCountGroup)
 		// .xUnits(dc.units.fp.precision(binwidth))
-		.xUnits(function() {return 50;})
-		.x(d3.scale.linear().domain([-1,max]))
+		.xUnits(function() {return 75;})
+		.x(d3.scale.linear().domain([0-max*0.1,max]))
 		.y(d3.scale.linear().domain([0,maxy+150]))
 		// .elasticX(true)
 		
@@ -204,7 +204,7 @@ window.addEventListener("load", function() {
 	  	}
 
 		// dc variables
-		var w = 578,
+		var w = 500,
 			h = 330,
 			obj       = data[0],
 			vartypes  = _.values(obj).map(function(x) {return typeof(x);}),
