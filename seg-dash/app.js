@@ -79,7 +79,7 @@ function createChart(Dimension,userDim,w,h){
 		.group(catCountGroup)
 		.x(d3.scale.ordinal()) 
 		.xUnits(dc.units.ordinal)
-		.y(d3.scale.linear().domain([miny,maxy+250]))
+		.y(d3.scale.linear().domain([0,maxy+500]))
 		.colors(d3.scale.ordinal().domain(["OK","NA"])
                                 .range(["#1F77B4","#e84747"]))
 		.colorAccessor(function(d) { 
@@ -102,8 +102,8 @@ function createChart(Dimension,userDim,w,h){
 		.elasticY(true)
 		.group(catCountGroup)
 		// .xUnits(dc.units.fp.precision(binwidth))
-		.xUnits(function() {return 100;})
-		.x(d3.scale.linear().domain([0,max]))
+		.xUnits(function() {return 50;})
+		.x(d3.scale.linear().domain([-10,max]))
 		.y(d3.scale.linear().domain([miny,maxy+150]))
 		// .elasticX(true)
 		
@@ -165,7 +165,8 @@ function create_js(labels,data){
 	        tooltips:{
 	        	callbacks: {
 	        		label: function(t,c){
-	        			return t.xLabel +'%'
+
+	        			return Math.round(t.xLabel) + '%'
 	        		}
 	        	}
 	        }
@@ -209,7 +210,7 @@ window.addEventListener("load", function() {
 			create_or_show(userDim)
 			dc.renderAll()
 
-			$('body').find('input:checkbox').attr('checked', false);
+			$('body').find('input:checkbox').prop('checked', false);
 	  	}
 
 		// dc variables
@@ -255,7 +256,7 @@ window.addEventListener("load", function() {
 		dataa = _.map(fiels, function(f){
 			return get_series(dat,f)
 		}),
-		d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)});
+		d = _.map(dataa,function(d){return d.yes/(d.total-d.missing)*100});
 
 		var chartjs = create_js(fiels,d);
 
@@ -280,7 +281,7 @@ window.addEventListener("load", function() {
 						dataa = _.map(fiels, function(f){
 							return get_series(dat,f)
 						});
-					var d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)})
+					var d = _.map(dataa,function(d){return d.yes/(d.total-d.missing)*100})
 					update_js(chartjs,d)
 				});
 			})
@@ -298,12 +299,6 @@ window.addEventListener("load", function() {
 
 	  		dc.renderAll();
 
-	  // 		var dat = Dimension.top(Infinity),
-			// 	dataa = _.map(fiels, function(f){
-			// 		return get_series(dat,f)
-			// 	});
-			// var d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)})
-			// update_js(chartjs,d)
 			dc_on()
 	  		
 		});
@@ -327,15 +322,11 @@ window.addEventListener("load", function() {
 	  		resetAll()
 	  		userDim = $("#variableList>option:selected").html()
 	  		var dat = dim(userDim).top(Infinity),
-			  //   fiels = _.filter(labels,function(f){
-					// 	var uni = _.uniq(_.map(dat,function(d){return d[f]}))
-					// 	return _.isEmpty(_.xor(uni, [ "0", "1", "-1" ])) 
-					// }),
 				dataa = _.map(fiels, function(f){
 					return get_series(dat,f)
 				}),
-			d = _.map(dataa,function(d){return Math.round(d.yes/(d.total-d.missing)*100)});
-			console.log(d)
+				d = _.map(dataa,function(d){return d.yes/(d.total-d.missing)*100});
+
 			update_js(chartjs,d)
 			dc_on()
 	  	})
