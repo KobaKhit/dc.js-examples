@@ -31,52 +31,65 @@ div{ display: block}
     <h1>Segmentation Dashboard</h1>
 
     <div class="container-fluid">
-      <div class = 'row'>
-        <div class = 'col-md-5'>
-          <!-- Variable list -->
-          <div>
-            <select id="variableList" ></select>
+      <ul class="nav nav-tabs">
+          <li class="nav active"><a href="#A" data-toggle="tab">Tableau</a></li>
+          <li class="nav"><a href="#B" data-toggle="tab">DC.js</a></li>
+      </ul>
+      <br>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+          <div class="tab-pane fade in active" id="A">
+            <script type='text/javascript' src='http://69.74.235.20/javascripts/api/viz_v1.js'></script><div class='tableauPlaceholder' style='width: 854px; height: 1136px;'><object class='tableauViz' width='854' height='1136' style='display:none;'><param name='host_url' value='http%3A%2F%2F69.74.235.20%2F' /> <param name='site_root' value='&#47;t&#47;Sixers' /><param name='name' value='STMSegmentation&#47;STMSegmentation' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='showShareOptions' value='true' /></object></div>
           </div>
 
-          <div id = 'dc-data-count'>You have
-            <span class="filter-count"></span>
-            selected out of 
-            <span class="total-count"></span>
-            Full Season Ticket Holders. 
+          <div class="tab-pane fade" id="B">
+            <div class = 'row'>
+              <div class = 'col-md-5'>
+                <!-- Variable list -->
+                <div>
+                  <select id="variableList" ></select>
+                </div>
+
+                <div id = 'dc-data-count'>You have
+                  <span class="filter-count"></span>
+                  selected out of 
+                  <span class="total-count"></span>
+                  Full Season Ticket Holders. 
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div>
+                  <b>Missing values</b>
+                  <form id = 'missingValues' style = 'display:inline' action="">
+                    <input type="checkbox" name="missing" value="Exclude"> Exclude<br>
+                  </form>
+                </div>
+                
+                <div class="clearfix"></div>
+
+                <div>
+                  <b>Zero values</b>
+                  <form id = 'zeroValues' style = 'display:inline' action="">
+                    <input type="checkbox" name="zero" value="Exclude"> Exclude<br>
+                  </form>
+                </div>
+
+                <div><a id = 'resetAll' href="#">Reset All</a></div>
+
+                <div id="charts" class = 'container'></div>
+                <div>
+                  <b>Filters</b>
+                  <ul id='filters'></ul>
+                </div>
+              </div>
+
+              <div class="col-md-7" style = 'height:1200px'><canvas id='chartjs'></canvas></div>
+            </div>
           </div>
 
-          <div class="clearfix"></div>
-
-          <div>
-            <b>Missing values</b>
-            <form id = 'missingValues' style = 'display:inline' action="">
-              <input type="checkbox" name="missing" value="Exclude"> Exclude<br>
-            </form>
-          </div>
-          
-          <div class="clearfix"></div>
-
-          <div>
-            <b>Zero values</b>
-            <form id = 'zeroValues' style = 'display:inline' action="">
-              <input type="checkbox" name="zero" value="Exclude"> Exclude<br>
-            </form>
-          </div>
-
-          <div><a id = 'resetAll' href="#">Reset All</a></div>
-
-          <div id="charts" class = 'container'></div>
-          <div>
-            <b>Filters</b>
-            <ul id='filters'></ul>
-          </div>
-        </div>
-
-        <div class="col-md-7" style = 'height:1200px'><canvas id='chartjs'></canvas></div>
-          
-   
       </div>
-
 
     </div>
   </body>
