@@ -319,6 +319,7 @@ window.addEventListener("load", function() {
 	  	})
 	  	
 	  	$('#resetAll').click(function() {
+	  		$("#filters").children().remove()
 	  		resetAll()
 	  		userDim = $("#variableList>option:selected").html()
 	  		var dat = dim(userDim).top(Infinity),
