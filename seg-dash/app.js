@@ -18,9 +18,9 @@ function get_series(dat,fiel){
 	count = 0,
 	missing = 0;
 	_.map(dat,function(d){
-		if(d[fiel]=='0'){
+		if(d[fiel]=='No'){
 			count+=1
-		} else if(d[fiel]=='1'){
+		} else if(d[fiel]=='Yes'){
 			count+=1
 			sum+=1
 		} else{missing+=1;count+=1}
@@ -59,8 +59,8 @@ function createChart(Dimension,userDim,w,h){
 	.dimension(Dimension)
 	.colors(d3.scale.ordinal().domain(["OK","NA"])
                                 .range(["#1F77B4","#e84747"]))
-		.colorAccessor(function(d) { 
-            if(d.key == '-1' || d.key == 'NA') 
+	.colorAccessor(function(d) { 
+            if(d.key == 'NA' || d.key == -1 ) 
                 return "NA"
             return "OK";})
 
@@ -166,8 +166,9 @@ function create_js(labels,data){
 	return chartjs
 }
 
+data = false
 window.addEventListener("load", function() {
-	d3.json("df2.json", function(data) {
+	d3.json("df3.json", function(data) {
 		function dim(userDim){return ndx.dimension(function(d) {return d[userDim];});}
 
 		function create_or_show(userDim){
@@ -241,7 +242,7 @@ window.addEventListener("load", function() {
 		var dat = Dimension.top(Infinity),
 	    fiels = _.filter(labels,function(f){
 				var uni = _.uniq(_.map(dat,function(d){return d[f]}))
-				return _.isEmpty(_.xor(uni, [ "0", "1", "-1" ])) 
+				return _.isEmpty(_.xor(uni, [ "No", "Yes", "NA" ])) 
 			}),
 		dataa = _.map(fiels, function(f){
 			return get_series(dat,f)
@@ -278,8 +279,6 @@ window.addEventListener("load", function() {
 		}
 
 		dc_on()
-
-		
 	
 		$('#variableList').change(function() {
 			
@@ -296,7 +295,7 @@ window.addEventListener("load", function() {
 		// Missinsg values filter
 	  	$('#missingValues').change(function() {
 	  		ch = $("#missingValues>input:checked").val();
-	  		if(ch == 'Exclude') {Dimension = dim(userDim); Dimension.filter(function(d) { return d!= '-1' && d!= 'NA'});}
+	  		if(ch == 'Exclude') {Dimension = dim(userDim); Dimension.filter(function(d) {  return d!= 'NA' && d!=-1});}
 	  		else {Dimension.filter(null)};
 	  		dc.redrawAll();
 	  	})
